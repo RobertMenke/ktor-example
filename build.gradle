@@ -1,0 +1,50 @@
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+mainClassName = 'io.ktor.server.netty.DevelopmentEngine'
+group = 'Experiment'
+version = '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.2.30'
+    ext.ktor_version = '0.9.1'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+    maven { url "http://kotlin.bintray.com/ktor" }
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    //Ktor artifacts - https://ktor.io/quickstart/artifacts.html
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-features:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-websockets:$ktor_version"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
