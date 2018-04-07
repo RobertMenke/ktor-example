@@ -1,8 +1,12 @@
 package app
 
+import freemarker.cache.ClassTemplateLoader
+import freemarker.cache.FileTemplateLoader
 import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
+import io.ktor.freemarker.FreeMarker
+import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -26,10 +30,14 @@ fun Application.main() {
     install(Sessions) {
         cookie<AuthenticatedSession>(AuthenticatedSession.NAME)
     }
+    //https://ktor.io/features/freemarker.html
+    install(FreeMarker) {
+        templateLoader = ClassTemplateLoader(Application::class.java.classLoader, "templates")
+    }
     //https://ktor.io/features/routing.html
     install(Routing) {
         get("/") {
-            call.respondText("My Example lol", ContentType.Text.Html)
+            call.respond(FreeMarkerContent("index.ftl", mapOf("test_name" to "World")))
         }
     }
 }
