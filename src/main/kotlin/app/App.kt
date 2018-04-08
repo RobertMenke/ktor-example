@@ -1,5 +1,6 @@
 package app
 
+import com.corundumstudio.socketio.listener.DataListener
 import freemarker.cache.ClassTemplateLoader
 import freemarker.cache.FileTemplateLoader
 import io.ktor.application.*
@@ -12,8 +13,15 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
+import io.ktor.sessions.sessions
+import io.ktor.util.moveToByteArray
+import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSockets
+import io.ktor.websocket.readText
+import io.ktor.websocket.webSocket
+import models.Location
 import session.AuthenticatedSession
+import sockets.SecureSocketServer
 import java.time.Duration
 
 fun Application.main() {
@@ -26,6 +34,7 @@ fun Application.main() {
         maxFrameSize = Long.MAX_VALUE // Disabled (max value). The connection will be closed if surpassed this length.
         masking = false
     }
+
     //https://ktor.io/features/sessions.html#install-basic
     install(Sessions) {
         cookie<AuthenticatedSession>(AuthenticatedSession.NAME)
@@ -40,4 +49,10 @@ fun Application.main() {
             call.respond(FreeMarkerContent("index.ftl", mapOf("test_name" to "World")))
         }
     }
+
+    val server = SecureSocketServer()
+    server.addEvent("location-in", Location::class.java, DataListener { client, data, ackRequest ->
+        log.info(data.toString())
+    })
 }
+
